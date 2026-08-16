@@ -13,17 +13,34 @@
         <div class="container fade-in">
             <div class="form-header">
                 <div class="brand-row">
-                    <div class="brand-badge">
-                        <img
-                            :src="resolvePublicAssetPath('images/icon.webp')"
-                            alt="NEGIAO's WebGIS"
-                            loading="eager"
-                        />
-                    </div>
-                    <div class="brand-text">
-                        <h1 class="form-title">NEGIAO's WebGIS</h1>
-                        <p class="app-purpose-title">{{ t('auth.appPurpose') }}</p>
-                    </div>
+                    <!-- 品牌区整体为返回首页入口（点击 logo/标题回 LandingView） -->
+                    <router-link
+                        to="/"
+                        class="brand-link"
+                        :title="t('landing.backHome')"
+                        :aria-label="t('landing.backHome')"
+                    >
+                        <div class="brand-badge">
+                            <img
+                                :src="resolvePublicAssetPath('images/icon.webp')"
+                                alt="NEGIAO's WebGIS"
+                                loading="eager"
+                            />
+                        </div>
+                        <div class="brand-text">
+                            <h1 class="form-title">NEGIAO's WebGIS</h1>
+                            <p class="app-purpose-title">{{ t('auth.appPurpose') }}</p>
+                        </div>
+                    </router-link>
+                    <!-- 返回首页图标按钮：右侧操作区，不占品牌区空间 -->
+                    <router-link
+                        to="/"
+                        class="back-home-icon"
+                        :title="t('landing.backHome')"
+                        :aria-label="t('landing.backHome')"
+                    >
+                        <Home :size="16" />
+                    </router-link>
                     <div
                         class="lang-toggle"
                         role="group"
@@ -650,6 +667,7 @@ import {
     Check,
     CheckCircle2,
     Footprints,
+    Home,
     Info,
     KeyRound,
     Loader2,
@@ -1694,6 +1712,27 @@ onUnmounted(() => {
     gap: 12px;
 }
 
+/* 品牌区即返回首页入口：不额外占位，hover 轻微降透明度提示可点 */
+.brand-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.15s ease;
+}
+
+.brand-link:hover {
+    opacity: 0.85;
+}
+
+.brand-link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.95);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
 .lang-toggle {
     margin-left: auto;
     display: inline-flex;
@@ -1704,6 +1743,31 @@ onUnmounted(() => {
     background: rgba(255, 255, 255, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.28);
     flex-shrink: 0;
+}
+
+/* 返回首页图标按钮：位于语言切换器左侧，与切换器同风格，不占品牌区空间 */
+.back-home-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: rgba(255, 255, 255, 0.92);
+    flex-shrink: 0;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.back-home-icon:hover {
+    background: rgba(255, 255, 255, 0.28);
+    color: #fff;
+}
+
+.back-home-icon:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.95);
+    outline-offset: 1px;
 }
 
 .lang-btn {
@@ -1779,9 +1843,12 @@ onUnmounted(() => {
     font-weight: 500;
     letter-spacing: 0.2px;
     opacity: 0.88;
-    white-space: nowrap;
+    /* 完整显示副标题：允许换行（最多 2 行），不再截断省略 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.45;
 }
 
 /* ─── 表单主体 ─── */
@@ -2488,6 +2555,10 @@ input:disabled {
         gap: 8px;
     }
 
+    .brand-link {
+        gap: 8px;
+    }
+
     .lang-toggle {
         gap: 1px;
         padding: 1px;
@@ -2505,7 +2576,7 @@ input:disabled {
     }
 
     .form-title {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .form-footer {

@@ -6,6 +6,53 @@
 
 ## 版本记录
 
+### V3.5.26 (2026-08-16) — 注册页品牌区显示修复 · 法务页返回首页入口
+
+- **显示修复**：`RegisterView.vue` 副标题（`auth.appPurpose`）由单行截断改为最多 2 行换行完整显示（`-webkit-line-clamp`），标题 ≤768px 字号 17→16px 留余量；头部卡片自适应高度不裁切。
+- **遗留闭环**：`TermsOfService.vue` / `PrivacyPolicy.vue` 顶部返回行改为 flex 布局，新增「返回首页 → /」（`fas fa-home`）+ 分隔符，与既有「返回登录页面」并排；两页为纯中文硬编码页面，与既有风格一致不引 i18n。
+- 验证：`tsc --noEmit` / 双门禁通过。
+
+详见 [变更日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.26-brand-text-legal-back-home.md)。
+
+### V3.5.25 (2026-08-16) — 注册页新增返回首页入口
+
+- `RegisterView.vue` 头部右侧操作区（语言切换器左侧）新增 34px 圆形房子图标按钮（`router-link to="/"` + lucide `Home`，`:title`/`:aria-label` 走 `landing.backHome`），样式与语言切换器同款半透明白 pill；品牌区（logo + 标题）保持左上原样，同时保留品牌区可点为隐藏强化入口。
+- **设计迭代（同任务内）**：V1 独立 pill 按钮挤压品牌区被否决 → V2 品牌区可点可发现性弱 → V3 右侧图标按钮（现行）。
+- `locales/core.js` landing 段新增 `backHome` 双语键（zh「返回首页」/ en「Home」），首屏即命中，不依赖懒加载 chunk。
+- 验证：`tsc --noEmit` / 双门禁通过。
+
+详见 [变更日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.25-register-back-home.md)。
+
+### V3.5.24 (2026-08-16) — 语言归一 SSOT 收口：非支持语言值不再折叠 zh-CN
+
+- **契约变更**：`useLocale.js` `normalizeLocaleLanguage` 的 else 分支由写死 `'zh-CN'` 改为 `detectSystemLanguage()`——空值/缺失/不支持的语言（如历史脏数据 `'fr'`）=「未设置有效偏好」→ 跟随浏览器默认语言（中文环境 zh-CN，其它 en-US）；仅显式 `zh-CN`/`en-US` 原样通过。
+- **链路同步**：偏好 store 删除 V3.5.23 新增的冗余 `normalizePreferenceLanguage`（新契约已覆盖空值兜底），`normalizePreferences` 还原直用 `normalizeLanguage`；`FloatingAccountPanel.vue` / `PreferencesTab.vue` 本地归一改为显式双分支 + 检测兜底。
+- **文档对齐**：README「版本演进」尾注截止版本由过期的「V3.3.21 及以前」修正为「V3.5.21 及以前」。
+- 验证：`tsc --noEmit` / 双门禁通过。
+
+详见 [变更日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.24-normalize-locale-ssot.md)。
+
+### V3.5.23 (2026-08-16) — 语言默认值收尾：远端空语言不再归 zh-CN · 偏好表单占位跟随系统
+
+- **修复 ① 远端空语言归一**：`useUserPreferencesStore.ts` 新增 `normalizePreferenceLanguage()`，`normalizePreferences` 对空/缺失 `language` 改为 `detectSystemLanguage()`（不再写死 `zh-CN`）；显式非空值仍按支持集归一（仅 zh-CN/en-US）。
+- **修复 ② 偏好表单占位**：`FloatingAccountPanel.vue`（preferenceDraft 初始值 + 本地 normalize 空语言兜底）与 `PreferencesTab.vue`（两个 props default + 本地 normalizeLanguage 空值兜底）统一改为 `detectSystemLanguage()`。
+- 语义统一：**空语言 = 未设置偏好 → 跟随浏览器默认**；显式输入路径（语言切换器/`normalizeLocaleLanguage` 契约）不变。
+- 附带收敛：README「版本演进」表由漂移的 5 行收敛回恒定 3 行（V3.5.23/22/21，更早摘要由 CHANGELOG 承载）。
+- 验证：`tsc --noEmit` / 双门禁通过。
+
+详见 [变更日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.23-fix-language-defaults.md)。
+
+### V3.5.22 (2026-08-16) — 首屏语言跟随浏览器默认语言（中文 → zh-CN，其它 → en-US）
+
+- **行为变更**：无本地语言偏好（全新访客）时，初始语言由硬编码 `zh-CN` 改为检测浏览器默认语言：`navigator.language`（降级 `navigator.languages[0]`）以 `zh` 开头 → `zh-CN`，其它或读取异常 → `en-US`。
+- **实现收敛于语言 SSOT**：`useLocale.js` 新增导出 `detectSystemLanguage()`，`readInitialLanguage()` 无存储值时走检测（兜底由 `zh-CN` 改为 `en-US`）；`useUserPreferencesStore.ts` 的 `DEFAULT_PREFERENCES.language` 与 `applyRuntimePreferences` 兜底同步改用检测结果，避免 `main.js` bootstrap 覆盖初始检测。
+- **优先级不变**：用户显式切换（本地 SSOT key）与登录偏好回写仍优先于检测结果。
+- LandingView.vue 零改动（首屏语言由全局 SSOT 统一供给）。
+- 验证：`tsc --noEmit` / 双门禁通过。
+- 注意：远端 `language` 为空时 `normalizePreferences` 仍归一为 `zh-CN`，已由本机 key 优先链路兜住；面板偏好表单的草稿占位默认值（`FloatingAccountPanel` / `PreferencesTab` 的 `language: 'zh-CN'`）不可达，未改。
+
+详见 [变更日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.22-detect-browser-language.md)。
+
 ### V3.5.21 (2026-08-16) — 综合版本：管理面板数据表格增强 · Agent 底图能力开放 · CyclOSM 骑行底图 · Landing/注册页 Lucide 迁移
 
 > 2026-08-15 的九个增量（原 V3.5.21–V3.5.29，多次不规范 commit 的暂存结果）按用户指示合并为单一版本 V3.5.21，分日志收敛为一份综合日志。

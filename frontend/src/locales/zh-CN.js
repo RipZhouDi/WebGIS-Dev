@@ -155,7 +155,7 @@ export default {
         yesterday: '昨天',
     },
     auth: {
-        appPurpose: '地理空间数据可视化与在线 WebGIS 平台',
+        appPurpose: '空间数据可视化&在线 WebGIS 平台',
         login: '登录',
         register: '注册',
         loginWithGoogle: '使用 Google 继续',

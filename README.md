@@ -80,7 +80,7 @@
 
 ## 🎯 项目简介
 
-**NEGIAO's WebGIS** 是一个功能完整、架构清晰的前后端分离 WebGIS 平台（当前版本 V3.5.21），前端托管于 GitHub Pages（正式域名 webgis.negiao.cn），后端以 Docker 部署在 Hugging Face Spaces，通过 RESTful API 通信，支持独立扩展。
+**NEGIAO's WebGIS** 是一个功能完整、架构清晰的前后端分离 WebGIS 平台（当前版本 V3.5.26），前端托管于 GitHub Pages（正式域名 webgis.negiao.cn），后端以 Docker 部署在 Hugging Face Spaces，通过 RESTful API 通信，支持独立扩展。
 
 > 📚 本 README 仅保留核心概览与导航。完整文档已模块化至 [`Docs/Guide/`](Docs/Guide/)，详见下方「文档导航」。
 >
@@ -400,13 +400,12 @@ HF Spaces 在 24 小时无访问后自动休眠。本平台通过**双向互保�
 
 | 版本 | 日期 | 概要 |
 |------|------|------|
-| **V3.5.21** | 2026-08-16 | 综合版本：管理面板数据表格增强（**分页 + 跨页搜索/排序 + CSV 导出 + 搜索高亮 + 行号/区间条**，rows 接口返回 total）· Agent 底图能力开放（`switch_basemap` 支持 **XYZ URL 二选一** + 自主构造公开源 + 预设目录**全量动态派生** 76 项）· 新增 **CyclOSM 骑行底图** · Landing/注册页 **Lucide 图标迁移**与 OneTap 慢载修复 · `.env` OAuth Client ID 分级调整（生产值转 HF Secrets）。详见[日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.21-consolidated.md) |
-| **V3.5.20** | 2026-08-15 | 宣传主页（LandingView）补全：中英文切换、icon.webp 品牌 logo、滚动修复（自持滚动容器）· 注册页 Landing 同源背景（经纬网格+光晕）· **正式域名接入**：webgis.negiao.cn 全链路落档（UI 页脚入口 + README/配置默认值同步）。详见[日志1](Docs/LLM_record/26-08/2026-08-15/2026-08-15-landing-i18n-scroll-background.md) · [日志2](Docs/LLM_record/26-08/2026-08-15/2026-08-15-official-domain-webgis-negiao-cn.md) |
-| **V3.5.19** | 2026-08-12 | 综合版本：实时在线统计体系（**心跳模型**：前端 5s 心跳、后端 15s 窗口自动剔除、每 15s 广播，重塑游客计在线）· 时区 UTC+8 修正 · IP 定位加固（公网 IP 上报/私有 IP 检测/ipwho.is 优先）。详见[日志](Docs/LLM_record/26-08/2026-08-12/2026-08-12-v3.5.19-consolidated.md) |
-| **V3.5.18** | 2026-08-12 | 综合版本：Emoji→Lucide 图标迁移 · 管理面板数据表格化重构 · KaTeX 数学公式渲染 · 代码审查修复。详见[日志](Docs/LLM_record/26-08/2026-08-12/2026-08-12-v3.5.18-consolidated.md) |
+| **V3.5.26** | 2026-08-16 | 注册页品牌区显示修复：副标题改为 2 行换行完整显示（不再省略），标题窄屏 16px 留余量；`/terms`、`/privacy` 顶部返回行新增「返回首页」链接（解决 V3.5.25 遗留）。详见[日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.26-brand-text-legal-back-home.md) |
+| **V3.5.25** | 2026-08-16 | 注册页新增返回首页入口：头部右侧（语言切换器旁）圆形房子图标按钮 + 品牌区可点强化，logo 布局零影响；`landing.backHome` 双语键入 core.js。详见[日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.25-register-back-home.md) |
+| **V3.5.24** | 2026-08-16 | 语言归一 SSOT 收口：`normalizeLocaleLanguage` 非支持值（含空值、历史脏数据如 `'fr'`）不再折叠 `zh-CN`，一律跟随浏览器默认语言；偏好 store / 账号面板本地归一同步收口，冗余兜底函数删除；README 尾注截止版本对齐。详见[日志](Docs/LLM_record/26-08/2026-08-16/2026-08-16-v3.5.24-normalize-locale-ssot.md) |
 
 
-更早版本（V3.3.21 及以前）请查阅 [完整更新日志 →](Docs/Guide/CHANGELOG.md)
+更早版本（V3.5.23 及以前）请查阅 [完整更新日志 →](Docs/Guide/CHANGELOG.md)
 
 ---
 
@@ -428,6 +427,6 @@ HF Spaces 在 24 小时无访问后自动休眠。本平台通过**双向互保�
 |:------:|:--------:|:--------:|
 | [GitHub](https://github.com/NEGIAO/WebGIS-Dev) | [webgis.negiao.cn](https://webgis.negiao.cn)（正式域名，GitHub Pages 托管） | [Hugging Face](https://NEGIAO-WebGIS.hf.space) |
 
-<sub>V3.5.21 · 开发中 · 最后更新 2026-08-16</sub>
+<sub>V3.5.26 · 开发中 · 最后更新 2026-08-16</sub>
 
 </div>

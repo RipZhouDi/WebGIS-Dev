@@ -159,6 +159,7 @@ export const coreMessages = {
         // 根路径宣传主页（LandingView）首屏必需键
         landing: {
             navLogin: '登录 / 注册',
+            backHome: '返回首页',
             heroEyebrow: '专业级 WebGIS 平台',
             heroExplore: '探索地理空间数据',
             heroAccent: '可视化与云端管理',
@@ -375,6 +376,7 @@ export const coreMessages = {
         // First-paint copy for the root landing page (LandingView)
         landing: {
             navLogin: 'Sign in / Register',
+            backHome: 'Home',
             heroEyebrow: 'Professional WebGIS Platform',
             heroExplore: 'Explore Geospatial Data',
             heroAccent: 'Visualization & Cloud Management',
