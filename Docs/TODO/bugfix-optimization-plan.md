@@ -330,3 +330,9 @@ Sprint 3（穿插）：P3-1 容器二轮（O1/O2 交替）→ P2-1 bundle 分析
 - [ ] **管理端密钥框同类自动填充风险**（2026-10-29 · V3.6.32 顺带发现，按 §2.5 只记不改）：
   - [ ] (缺陷·已记未修) **`ApiKeysManagementPanel.vue` 的「默认 AI API Key」为 `type="password"` 且未声明 `autocomplete`**：与 V3.6.32 修复的建筑抓取凭证框属同一类问题 —— Chrome 对 password 字段忽略 autocomplete，会把本站点登录密码填入；该面板一旦「填入并保存」，密码就会写进密钥表，形成真正的 L2 污染（本次事故中数据库未被污染，属侥幸）。修法：改 `type="text"` + `-webkit-text-security` 遮蔽，或至少补 `autocomplete="new-password"` + `data-lpignore` / `data-1p-ignore` / `data-bwignore`，并在保存前加 24~64 位字母数字格式闸门。预估 0.2 人日
   - [ ] (待确认) **游客可打开建筑抓取面板**：本次事故的放大条件 —— 低权限会话触发高权限凭据被注入并外发。是否收紧 `buildings` tab 的可见性或配额，属产品决策，未在本轮改动范围内
+
+- [ ] **「OSM代理」底图被上游拦截**（2026-10-30 · V3.6.33 实测发现，按用户决定保留官方源）：
+  - [ ] (缺陷·已记未修) **`osm_Backend_Proxy` 当前不可用**：`vpn.negiao.cn/proxy/tile.openstreetmap.org/*` 返回 256×256「403 Access blocked」提示图。HTTP 状态仍为 200（代理不校验响应内容），且带 `Cache-Control: max-age=604800`，错误图在 Cloudflare 边缘缓存 7 天。实测同期 `tile.openstreetmap.de` 经同一代理正常（37512 B / 27989 B），`mt1.google.com` 亦正常，故问题定位在 OSM 基金会对该出口 IP 的政策拦截，而非代理整体故障。触发特征：短时间十余次请求即可触发，正常浏览一屏地图（数十张瓦片）必然命中。可选修法：① 代理侧为 OSM 单独配置合规 User-Agent（含联系方式）并按政策限速、避免缓存 4xx 内容；② 上游改 `tile.openstreetmap.de`；③ 自托管 OSM 瓦片。预估 0.3 人日（不含 ③）。**进展（2026-10-30）**：① 的身份修复与「相同字节瓦片检测」已在独立仓 `tile-proxy` 1.2.0 实现（待部署）；部署后必须 purge `vpn.negiao.cn/proxy/tile.openstreetmap.org/*` 的 Cloudflare 边缘缓存 —— 旧拦截图带 `s-maxage=604800`，不清会继续按 7 天 TTL 返回。
+
+- [ ] **架构文档坐标系归属失实**（2026-10-30 · V3.6.33 顺带发现，按 §2.5 只记不改）：
+  - [ ] (缺陷·已记未修) **`Docs/Architecture/tile-rectify-system.md` §2 把「天地图」列为 GCJ-02 使用者**：与代码现状不符 —— `basemapConfig.ts` 中天地图各图源均以 `tk` 直连 `t0.tianditu.gov.cn` / DataServer，**未走** `gcj2wgsProxyUrl`；实际经纠偏代理的是高德（`imagery_amap_wgs` / `vector_amap_wgs` / `amap_label`）、腾讯（`vector_tengxun_wgs`）、Google 中国（`vector_Google_clean` / `imagery_google_water`），BD-09 仅百度（`vector_baidu_wgs`）。天地图发布 CGCS2000（与 WGS-84 差异 1 m 量级），本无需纠偏。本次撰写对外文案时按代码核对后已避开该错误，但架构文档本身未改。修法：把该表「谁在用」列的「天地图」移除，并补一句「天地图发布 CGCS2000，可直接按 WGS-84 使用」。预估 0.1 人日

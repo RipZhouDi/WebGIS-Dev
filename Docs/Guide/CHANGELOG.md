@@ -6,6 +6,18 @@
 
 ## 版本记录
 
+### V3.6.33 (2026-10-30) — 落地页与 README 补充「非标准瓦片在线纠偏」能力说明
+
+> **背景**：GCJ-02 / BD-09 瓦片在线纠偏是本项目底图链路的核心能力（国内合规图源无一发布 WGS-84 瓦片，直接贴图会整城错位），但 2026-09-15 该能力整包迁出本仓后，只更新了架构文档与「已知限制」，从未回填对外介绍文案。落地页 10 张功能卡与两份 README 的核心能力表都只有「GCJ-02 纠偏」五个字，BD-09 完全缺席。
+> **A · 落地页**：`FEATURES` 新增第 11 张卡 `feature11`（`Crosshair` 图标，与「建筑白模」同为整行宽卡），中英文案落 `locales/core.js`（中英双段同文件）。选「新增卡」而非「并入底图源卡」：纠偏是作用于所有底图请求的基础设施，没有独立 UI 面板，若继续依附于底图源一行，会重演「按面板盘点功能」的盲区。网格行数已核算 —— `grid-column: 1 / -1` 只写在 `min-width: 1025px` 内，2 列断点下宽卡本就退化为普通卡，故 11 卡在 3 列（4+8+3+3=18 格）与 2 列（主卡整行 + 10 卡）下均为 6 行且铺满，**未改动任何 CSS 规则**，仅订正三处已失效的行数注释。
+> **B · README**：`README.md` 与 `Docs/README_EN.md` 的「核心能力 · 地图内核」各新增一行，写明「服务端逐瓦片重采样 → 输出与标准 XYZ 网格对齐的 256×256 影像 → 前端按普通底图加载、双引擎零改造」，并标注百度侧为跨网格重投影、另提供反向 `wgs2gcj` / `wgs2bd` 与通用直通代理。
+> **C · 失实措辞订正**：两份 README 的「已知限制」原写「`tile-rectify-system.md` 为历史设计稿」，而该文档自述「只保留业务说明与接入契约」，仍是权威接入来源；改为「实现已迁出本仓、能力仍在线」，并补上 `tile-proxy` / `vpn.negiao.cn/proxy/*` 与「HF Space 禁止挂载 `/proxy/*`」的原因，避免读者误判能力已下线。
+> **D · README_EN 断档回填**：英文版版本表首行为 V3.6.31，缺 V3.6.32。因本次需在同表插入 V3.6.33，为不留可见断档，一并补齐 V3.6.32 英文摘要，表仍保持 3 行。
+> **E · 新增「OSM代理」底图**：为缓解 OSM 官方瓦片在境内间歇不可达（README「已知限制」既有条目），新增 `osm_Backend_Proxy` 走 `vpn.negiao.cn/proxy` 统一瓦片代理，上游 `tile.openstreetmap.org/{z}/{x}/{y}.png`，`maxZoom: 19`（OSM 官方上限，不设会在 z20+ 反复请求 404）。图层定义插在 `google_Backend_Proxy` 之后，预设 `osm_Backend_Proxy_preset` 插在 `google_Backend_Proxy_preset`（后端代理谷歌）之后；Cesium 描述符由 `getDescriptorById` 自动派生，未改。**副作用（已获用户确认）**：预设数组下标即 `?l=` 编号与后台 `default_basemap_index`，插入第 12 项后其后 79 项编号整体 +1，已分享链接与管理员默认底图需重新选定。数量同步 90→91 预设 / 106→107 图层定义（英文版滞后的 96 一并校准为 107）。**⚠️ 上线前实测：该条当前不可用** —— 2026-10-30 实测 `vpn.negiao.cn/proxy/tile.openstreetmap.org/*` 返回 256×256「403 Access blocked」提示图：HTTP 仍为 200（代理不校验内容），响应头 `Age: 16` + `last-modified` 为请求前 16 秒，证明是上游实时拦截而非本地缓存；且代理对其同样下发 `Cache-Control: max-age=604800`，错误图会在边缘留存 7 天。同期 `tile.openstreetmap.de` 经同一代理返回真实瓦片（37512 B / 27989 B）。根因是 OSM 基金会瓦片使用政策拒绝单一出口 IP 的批量转发。用户决定保留官方源，故本条以「已知不可用」状态入库，后续需代理侧按政策修正 UA 与限速，或改用镜像 / 自托管。已记入 `Docs/TODO/bugfix-optimization-plan.md`。
+> **验证**：`CheckStructureTree` / `CheckConfigRegistry` 结果见本次日志；无新增 `.ts` / `.js` 逻辑文件，无后端与配置改动；平台红线四项不适用（未触碰 `backend/`、`deploy/`、`frontend/src/` 中任何代理/中转代码）。
+> **未覆盖**：未实机验证 `vpn.negiao.cn/proxy/*` 当前可用性（文案按「能力存在」表述，依据为架构文档与前端既有调用）；`Docs/README_EN.md` 技术栈数字（OL 10.5 / Cesium 1.132 / 96 层）仍滞后于中文版，属既有漂移，本次不动。
+> 完整记录：[`2026-10-30-tile-rectify-docs.md`](../LLM_record/26-10/2026-10-30/2026-10-30-tile-rectify-docs.md)
+
 ### V3.6.32 (2026-10-29) — 建筑抓取临时凭证框加固（登录密码被浏览器自动填充并外发修复）
 
 > **问题**：用户在 DevTools 中看到两条请求的凭据字段里是自己**登录密码** —— `https://jsapi.amap.com/web/init?key=…` 与 `https://tile0.tianditu.gov.cn/vts?t=vt&pk=…&tk=…`。排查确认数据库侧无恙（`api_keys.amap_key` 32 位 `90…`、`tianditu_tk` 32 位 `b8…`，互不相同且非该密码），污染发生在前端：建筑抓取面板的「临时凭证」输入框使用 `type="password"`，而 Chrome 密码管理器**对 password 字段忽略 `autocomplete="off"`**，会把本站点（`webgis.negiao.cn`）保存的登录凭据自动填入。凭据库按 origin 索引、与会话身份无关，因此**游客态下被填入的仍是管理员密码**；该值再经 `inputKey || L2` 的短路优先级当作临时凭证，明文拼进两家第三方的 GET query（天地图按瓦片逐请求，0.2° 范围量级达千次）。

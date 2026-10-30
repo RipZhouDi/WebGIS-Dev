@@ -67,6 +67,8 @@
                     >
                         <svg
                             class="icon-github"
+                            width="15"
+                            height="15"
                             viewBox="0 0 16 16"
                             aria-hidden="true"
                         >
@@ -188,6 +190,8 @@
                         >
                             <svg
                                 class="icon-github"
+                                width="15"
+                                height="15"
                                 viewBox="0 0 16 16"
                                 aria-hidden="true"
                             >
@@ -523,6 +527,8 @@
                         <span class="cta-method"><svg class="cta-g-logo" viewBox="0 0 23.5 24" aria-hidden="true"><clipPath id="ctg-a"><path d="M12 10v4.5h6.47c-.5 2.7-3 4.74-6.47 4.74-3.9 0-7.1-3.3-7.1-7.25S8.1 4.75 12 4.75c1.8 0 3.35.6 4.6 1.8l3.4-3.4C18 1.2 15.24 0 12 0 5.4 0 0 5.4 0 12s5.4 12 12 12c7 0 11.5-4.9 11.5-11.7 0-.8-.1-1.54-.2-2.3z"/></clipPath><filter id="ctg-b"><feGaussianBlur stdDeviation="1"/></filter><g style="clip-path:url(#ctg-a)"><foreignObject style="filter:url(#ctg-b)" height="28" width="28" transform="translate(-2 -2)"><div xmlns="http://www.w3.org/1999/xhtml" style="height:100%;width:100%;background:conic-gradient(#FF4641,#FD5061 40deg,#FD5061 60deg,#3186FF 85deg,#3186FF 117deg,#00A5B7 142deg,#0EBC5F 167deg,#0EBC5F 200deg,#6CC500 226deg,#FC0 253deg,#FFD314 268deg,#FC0 292deg,#FF4641 327deg)"/></foreignObject><path fill="#3186FF" d="M11 8h16v8H11z"/></g></svg>Google</span>
                         <span class="cta-method"><svg
                         class="icon-github"
+                        width="15"
+                        height="15"
                         viewBox="0 0 16 16"
                         aria-hidden="true"
                     >
@@ -561,6 +567,8 @@
                             >
                                 <svg
                                     class="icon-github"
+                                    width="15"
+                                    height="15"
                                     viewBox="0 0 16 16"
                                     aria-hidden="true"
                                 >
@@ -770,6 +778,8 @@
                                 >
                                     <svg
                                         class="icon-github"
+                                        width="15"
+                                        height="15"
                                         viewBox="0 0 16 16"
                                         aria-hidden="true"
                                     >
@@ -820,6 +830,7 @@ import {
     ChevronRight,
     Cloud,
     CloudSun,
+    Crosshair,
     ExternalLink,
     FileUp,
     GitFork,
@@ -944,8 +955,11 @@ const FEATURES = Object.freeze([
     { key: 'feature7', icon: Bot },
     { key: 'feature8', icon: ShieldCheck },
     { key: 'feature9', icon: Wrench },
-    // 第 10 张卡跨满整行，呈横向汇总卡
+    // 末尾两张卡各跨满整行，呈横向汇总卡：
+    // 3 列下 4（主卡 2×2）+ 8 + 3 + 3 = 18 格 = 6 行；2 列下主卡整行 + 10 小卡 = 5 行，
+    // 两种断点都恰好铺满，不留孤卡
     { key: 'feature10', icon: Building2, wide: true },
+    { key: 'feature11', icon: Crosshair, wide: true },
 ]);
 
 const features = computed(() =>
@@ -1035,7 +1049,7 @@ const heroStats = computed(() =>
 );
 
 // 移动端菜单：两级索引，结构照搬南师大 header-con 的 `h2.title` → `dl > dd`。
-// 关键点是"子项不是凑数的"—— 核心功能下挂 10 张真实功能卡、技术栈下挂 3 层卡片，
+// 关键点是"子项不是凑数的"—— 核心功能下挂 11 张真实功能卡、技术栈下挂 3 层卡片，
 // 每一条都滚到页面上真实存在的落点（卡片各自带 id）。
 // 这样 4 个栏目也能把一屏填满，靠的是内容密度，而不是把行高拉到 128px 硬撑。
 const MOBILE_MENU = computed(() => [
@@ -1975,6 +1989,16 @@ button:focus-visible {
     height: 15px;
     fill: currentColor;
     flex-shrink: 0;
+}
+
+/* iOS Safari：内联 SVG 作为 flex 子项时默认 flex-shrink: 1，窄屏挤压会被压成
+   0 宽 —— 表现为导航 / 页脚 / CTA 的图标「塌陷」（桌面 Chrome 有更宽的视口，
+   往往先不触发）。图标一律不参与收缩；固有尺寸另由各处的 width/height 属性兜底，
+   避免 Safari 在拿不到 CSS 尺寸时按 viewBox 比例算出 0。 */
+.navbar svg,
+.footer svg,
+.cta-method svg {
+    flex: none;
 }
 
 .nav-github-count {
@@ -3165,9 +3189,10 @@ button:focus-visible {
     }
 }
 
-/* 桌面 3 列下 10 卡 = 3+3+3+1，末行孤卡左挂失衡：
-   最后一张卡跨满整行、转为「图标 + 文案」横向汇总卡；
-   仅在 3 列布局（>1024px）生效，2 列恰满 5 行、单列无需处理 */
+/* 桌面 3 列下按等宽排布会在末行留孤卡，故末尾若干张卡跨满整行、
+   转为「图标 + 文案」横向汇总卡：11 卡 = 主卡 2×2（4 格）+ 8 格 + 宽卡 3 格 ×2
+   = 18 格 = 6 行，恰好铺满。跨列仅在 3 列布局（>1024px）生效；
+   2 列下宽卡退化为普通卡，主卡整行 + 10 张普通卡 = 5 行，合计 6 行同样铺满；单列无需处理 */
 .feature-card--wide {
     display: flex;
     flex-direction: column;
@@ -4870,7 +4895,7 @@ button:focus-visible {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    /* 2 列下 10 卡恰满 5 行，取消孤卡居中 */
+    /* 2 列下主卡整行 + 10 张普通卡恰满 5 行，取消孤卡居中 */
     .features-grid .feature-card:last-child {
         grid-column: auto;
     }
